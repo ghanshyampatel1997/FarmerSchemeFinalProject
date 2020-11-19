@@ -1,0 +1,198 @@
+CREATE TABLE [Admin]
+(
+ [UserId]   nvarchar(40) NOT NULL ,
+ [Password] nvarchar(50) NOT NULL ,
+
+
+ CONSTRAINT [PK_admin] PRIMARY KEY CLUSTERED ([UserId] ASC)
+);
+GO
+
+
+
+CREATE TABLE [UserRegister]
+(
+ [UserEmailId]        nvarchar(50) NOT NULL ,
+ [UserType]           nvarchar(10) NOT NULL ,
+ [ContactNo.]         nvarchar(20) NOT NULL ,
+ [fullname]           nvarchar(10) NOT NULL ,
+ [address1]           nvarchar(100) NOT NULL CONSTRAINT [DF_UserRegister_address1] DEFAULT (getdate()) ,
+ [address2]           nvarchar(100) NULL ,
+ [city]               nvarchar(50) NOT NULL ,
+ [state]              nvarchar(50) NOT NULL ,
+ [pincode]            int NOT NULL ,
+ [aadharCardDocument] image NOT NULL ,
+ [pancardDocument]    image NOT NULL ,
+ [certificate]        image NOT NULL ,
+ [password]           nvarchar(50) NOT NULL ,
+ [ApprovedFarmer]     bit NULL ,
+
+ CONSTRAINT [PK_Order] PRIMARY KEY CLUSTERED ([UserEmailId] ASC),
+ CONSTRAINT [AK1_Order_OrderNumber] UNIQUE NONCLUSTERED ([fullname] ASC)
+);
+GO
+EXEC sp_addextendedproperty @name = N'MS_Description', @value = N'Order information
+like Date, Amount', @level0type = N'SCHEMA', @level0name = N'dbo', @level1type = N'TABLE', @level1name = N'UserRegister';
+GO
+
+
+
+
+CREATE TABLE [BankDetails]
+(
+ [IFSCCode]      nvarchar(50) NOT NULL ,
+ [BankId]        int IDENTITY (1000, 1) NOT NULL ,
+ [BankAccountNo] bigint NOT NULL ,
+ [UserEmailId]   nvarchar(50) NOT NULL ,
+
+ CONSTRAINT [PK_bankdetails] PRIMARY KEY CLUSTERED ([BankId] ASC),
+ CONSTRAINT [FK_266] FOREIGN KEY ([UserEmailId])  REFERENCES [UserRegister]([UserEmailId])
+);
+GO
+CREATE NONCLUSTERED INDEX [fkIdx_266] ON [BankDetails] 
+ (
+  [UserEmailId] ASC
+ )
+GO
+
+
+CREATE TABLE [FarmerLand]
+(
+ [landArea]    nvarchar(50) NOT NULL ,
+ [FarmId]      int IDENTITY (1, 1) NOT NULL ,
+ [landAddress] nvarchar(100) NOT NULL ,
+ [landPinCode] int NOT NULL ,
+ [UserEmailId] nvarchar(50) NOT NULL ,
+ CONSTRAINT [PK_farmerland] PRIMARY KEY CLUSTERED ([FarmId] ASC),
+ CONSTRAINT [FK_258] FOREIGN KEY ([UserEmailId])  REFERENCES [UserRegister]([UserEmailId])
+);
+GO
+CREATE NONCLUSTERED INDEX [fkIdx_258] ON [FarmerLand] 
+ (
+  [UserEmailId] ASC
+ )
+GO
+
+
+
+CREATE TABLE [Cropprice]
+(
+ [CropId]   int NOT NULL ,
+ [cropname] nvarchar(50) NOT NULL ,
+ [MSP]      int NOT NULL ,
+ CONSTRAINT [PK_croptable] PRIMARY KEY CLUSTERED ([CropId] ASC)
+);
+GO
+
+
+
+
+CREATE TABLE [FarmerCropdetils]
+(
+ [FarmerSellID]       int IDENTITY (1000, 1) NOT NULL ,
+ [cropType]           nvarchar(40) NOT NULL ,
+ [UserEmailId]        nvarchar(50) NOT NULL ,
+ [CropId]             int NOT NULL ,
+ [fertilizerType]     nvarchar(50) NOT NULL ,
+ [quantity]           int NOT NULL ,
+ [SoilPHCertificate]  image NOT NULL ,
+ [AproovedFarmersell] bit NULL ,
+
+ CONSTRAINT [PK_Customer] PRIMARY KEY CLUSTERED ([FarmerSellID] ASC),
+ CONSTRAINT [AK1_Customer_CustomerName] UNIQUE NONCLUSTERED ([cropType] ASC),
+ CONSTRAINT [FK_144] FOREIGN KEY ([UserEmailId])  REFERENCES [UserRegister]([UserEmailId]),
+ CONSTRAINT [FK_228] FOREIGN KEY ([CropId])  REFERENCES [Cropprice]([CropId])
+);
+GO
+CREATE NONCLUSTERED INDEX [fkIdx_144] ON [FarmerCropdetils] 
+ (
+  [UserEmailId] ASC
+ )
+GO
+CREATE NONCLUSTERED INDEX [fkIdx_228] ON [FarmerCropdetils] 
+ (
+  [CropId] ASC
+ )
+GO
+EXEC sp_addextendedproperty @name = N'MS_Description', @value = N'Basic information 
+about Customer', @level0type = N'SCHEMA', @level0name = N'dbo', @level1type = N'TABLE', @level1name = N'FarmerCropdetils';
+GO
+
+
+
+CREATE TABLE [BiddingTable]
+(
+ [BidID]        int IDENTITY (1, 1) NOT NULL ,
+ [bidAmount]    int NOT NULL ,
+ [FarmerSellID] int NOT NULL ,
+ [ApprovedBid]  bit NULL ,
+ [date]         date NULL ,
+ [UserEmailId]  nvarchar(50) NOT NULL ,
+
+ CONSTRAINT [PK_bid] PRIMARY KEY CLUSTERED ([BidID] ASC),
+ CONSTRAINT [FK_235] FOREIGN KEY ([FarmerSellID])  REFERENCES [FarmerCropdetils]([FarmerSellID]),
+ CONSTRAINT [FK_272] FOREIGN KEY ([UserEmailId])  REFERENCES [UserRegister]([UserEmailId])
+);
+GO
+CREATE NONCLUSTERED INDEX [fkIdx_235] ON [BiddingTable] 
+ (
+  [FarmerSellID] ASC
+ )
+GO
+CREATE NONCLUSTERED INDEX [fkIdx_272] ON [BiddingTable] 
+ (
+  [UserEmailId] ASC
+ )
+GO
+
+
+
+CREATE TABLE [InsuranceApplication]
+(
+ [PolicyNo]    int IDENTITY (1000000, 1) NOT NULL ,
+ [UserEmailId] nvarchar(50) NOT NULL ,
+ [season]      nchar(30) NOT NULL ,
+ [year]        int NOT NULL ,
+ [cropname]    nvarchar(50) NOT NULL ,
+ [SumInsured]  int NOT NULL ,
+ [FarmId]      int NOT NULL ,
+
+ CONSTRAINT [PK_insuranceapplication] PRIMARY KEY CLUSTERED ([PolicyNo] ASC),
+ CONSTRAINT [FK_173] FOREIGN KEY ([UserEmailId])  REFERENCES [UserRegister]([UserEmailId]),
+ CONSTRAINT [FK_276] FOREIGN KEY ([FarmId])  REFERENCES [FarmerLand]([FarmId])
+);
+GO
+CREATE NONCLUSTERED INDEX [fkIdx_173] ON [InsuranceApplication] 
+ (
+  [UserEmailId] ASC
+ )
+GO
+CREATE NONCLUSTERED INDEX [fkIdx_276] ON [InsuranceApplication] 
+ (
+  [FarmId] ASC
+ )
+GO
+
+
+
+
+CREATE TABLE [ClaimForm]
+(
+ [PolicyNo]     int NOT NULL ,
+ [ClaimNo]      bigint IDENTITY (5000000, 1) NOT NULL ,
+ [dateOfLoss]   date NOT NULL ,
+ [CauseOfLoss]  nvarchar(50) NOT NULL ,
+ [ClaimApprove] bit NULL ,
+
+ CONSTRAINT [PK_claimform] PRIMARY KEY CLUSTERED ([ClaimNo] ASC),
+ CONSTRAINT [FK_185] FOREIGN KEY ([PolicyNo])  REFERENCES [InsuranceApplication]([PolicyNo])
+);
+GO
+
+CREATE NONCLUSTERED INDEX [fkIdx_185] ON [ClaimForm] 
+ (
+  [PolicyNo] ASC
+ )
+GO
+
+

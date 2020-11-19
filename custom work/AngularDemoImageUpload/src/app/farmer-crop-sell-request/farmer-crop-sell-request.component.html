@@ -1,0 +1,70 @@
+
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+      
+      <ul class="nav navbar-nav navbar-right">
+        
+        <li><a href="#"><span class="glyphicon glyphicon-log-out"></span> Log Out</a></li>
+      </ul>
+    </div>
+</nav>
+
+<div *ngIf="farmeroption">
+    <br/><br/><br/>
+    <div class="container-fluid">
+       <p style="text-align: center;"><b><button (click)="sellrequest()">Sell Request </button> </b></p>
+    </div>
+    <br/><br/>
+    <div class="container-fluid">
+        <p style="text-align: center;"><b><button (click)="cropHistoryrequest()">View Sold Crop History </button> </b></p>
+    </div>
+    <br/><br/>
+    <div class="container-fluid">
+        <p style="text-align: center;"><b><button (click)="MarketPlacerequest()">View Marketplace </button> </b></p>
+    </div>
+</div>
+
+<div *ngIf="fsellrequestvalue">
+    <br/><br/><br/>
+    <div class="container">
+        <div class="row">
+          <div class="col s8 offset-2">
+            <!-- <div class="card-panel teal lighten-2">
+              <h4 class="center white-text">Image Library</h4>
+            </div> -->
+            <form #imageForm=ngForm (ngSubmit)="OnSubmit(Cropetype,CropeName,Fertilizertype,Quantity,Image)">
+              <div class="row">
+                <div class="input-field col s12">
+                    <label for="Cropetype">Crope type</label>
+                  <input type="text" #Cropetype ngModel name="Cropetype" id="Cropetype" required>  
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12">
+                    <label for="CropeName">Crope Name</label>
+                  <input type="text" #CropeName ngModel name="CropeName" id="CropeName" required>  
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12">
+                    <label for="Fertilizertype">Fertilizer type</label>
+                  <input type="text" #Fertilizertype ngModel name="Fertilizertype" id="Fertilizertype" required>  
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12">
+                    <label for="Quantity">Quantity</label>
+                  <input type="text" #Quantity ngModel name="Quantity" id="Quantity" required>  
+                </div>
+              </div>
+              <label for="Quantity">Soil PH Certificate</label>
+              <img [src]="imageUrl"  style="width:250px;height:200px">
+              <input type="file" #Image accept="image/*" (change)="handleFileInput($event.target.files)">
+              <button type="submit" class="btn-large btn-submit" [disabled]="Image.value=='' || !imageForm.valid">Submit</button>
+            </form>
+          </div>
+        </div>
+      </div>
+</div>
+
+
